@@ -212,31 +212,31 @@ jQuery(document).ready(function($) {
         }, 1000);
 	})();
 
-	(function updateCompliment()
-	{
-		var compliments = [
-			'Hey, handsome!',
-			'Hi, sexy!',
-			'Hello, beauty!',
-			'You look sexy!',
-			'Wow, you look hot!',
-			'Looking good today!',
-			'You look nice!',
-			'Enjoy your day!'
-		];
-
-		while (compliment == lastCompliment) {
-			compliment = Math.floor(Math.random()*compliments.length);
-		}
-
-		$('.compliment').updateWithText(compliments[compliment], 4000);
-
-		lastCompliment = compliment;
-
-		setTimeout(function() {
-			updateCompliment(true);
-		}, 30000);
-	})();
+// 	(function updateCompliment()
+// 	{
+// 		var compliments = [
+// 			'Hey, handsome!',
+// 			'Hi, sexy!',
+// 			'Hello, beauty!',
+// 			'You look sexy!',
+// 			'Wow, you look hot!',
+// 			'Looking good today!',
+// 			'You look nice!',
+// 			'Enjoy your day!'
+// 		];
+// 
+// 		while (compliment == lastCompliment) {
+// 			compliment = Math.floor(Math.random()*compliments.length);
+// 		}
+// 
+// 		$('.compliment').updateWithText(compliments[compliment], 4000);
+// 
+// 		lastCompliment = compliment;
+// 
+// 		setTimeout(function() {
+// 			updateCompliment(true);
+// 		}, 30000);
+// 	})();
 
 	(function updateCurrentWeather()
 	{
@@ -338,21 +338,39 @@ jQuery(document).ready(function($) {
 	})();
 
 	(function fetchNews() {
-		$.feedToJson({
-			feed:'http://www.tagesschau.de/xml/rss2',
-			feed:'http://www.heise.de/security/news/news.rdf',
-			//feed:'http://www.nu.nl/feeds/rss/opmerkelijk.rss',
-			success: function(data) {
-				news = [];
-				for (var i in data.item) {
-					var item = data.item[i];
-					news.push(item.title);
+		var feeds = ['http://www.tagesschau.de/xml/rss2', 'http://www.heise.de/security/news/news.rdf'];
+		
+		for (var i in feeds) {
+			$.feedToJson({
+				feed:feeds[i],
+				success:function(data) {
+					news = [];
+					for (var j in data.item) {
+						var item = data.item[j];
+						news.push(item.title);
+					}
 				}
-			}
-		});
-		setTimeout(function() {
-			fetchNews();
-		}, 60000);
+			});
+			setTimeout(function() {
+				fetchNews();
+			}, 60000);
+		}
+	
+// 		$.feedToJson({
+// 			feed:'http://www.tagesschau.de/xml/rss2',
+// // 			feed:'http://www.heise.de/security/news/news.rdf',
+// // 			feed:'http://www.nu.nl/feeds/rss/opmerkelijk.rss',
+// 			success: function(data) {
+// 				news = [];
+// 				for (var i in data.item) {
+// 					var item = data.item[i];
+// 					news.push(item.title);
+// 				}
+// 			}
+// 		});
+// 		setTimeout(function() {
+// 			fetchNews();
+// 		}, 60000);
 	})();
 
 	(function showNews() {
