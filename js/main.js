@@ -37,7 +37,6 @@ function kmh2beaufort(kmh)
 }
 
 jQuery(document).ready(function($) {
-
 	var news = [];
 	var newsIndex = 0;
 
@@ -50,7 +49,7 @@ jQuery(document).ready(function($) {
     // var lang = window.navigator.language;
     
     // actually, I'd rather hardcode it for my usage
-    var lang = de;
+    var lang = 'de';
     
     switch (lang)
     {
@@ -191,7 +190,6 @@ jQuery(document).ready(function($) {
 		table = $('<table/>').addClass('xsmall').addClass('calendar-table');
 		opacity = 1;
 
-
 		for (var i in eventList) {
 			var e = eventList[i];
 			var days = e.days;
@@ -218,7 +216,6 @@ jQuery(document).ready(function($) {
 
 	(function updateCompliment()
 	{
-
 		var compliments = [
 			'Hey, handsome!',
 			'Hi, sexy!',
@@ -241,7 +238,6 @@ jQuery(document).ready(function($) {
 		setTimeout(function() {
 			updateCompliment(true);
 		}, 30000);
-
 	})();
 
 	(function updateCurrentWeather()
@@ -323,7 +319,6 @@ jQuery(document).ready(function($) {
 
 			}
 
-
 			var forecastTable = $('<table />').addClass('forecast-table');
 			var opacity = 1;
 			for (var i in forecastData) {
@@ -376,5 +371,4 @@ jQuery(document).ready(function($) {
 			showNews();
 		}, 5500);
 	})();
-	
 });
