@@ -47,7 +47,6 @@ jQuery(document).ready(function($) {
 
     // multi-langugage support according to browser-lang
     // var lang = window.navigator.language;
-    
     // actually, I'd rather hard-code it for my usage
     var lang = 'de';
     
@@ -87,16 +86,16 @@ jQuery(document).ready(function($) {
     }
 
 	// connect do Xbee monitor
-	var socket = io.connect('http://rpi-development.local:8080');
-	socket.on('dishwasher', function (dishwasherReady) {
-		if (dishwasherReady) {
-			$('.dishwasher').fadeIn(2000);
-			$('.lower-third').fadeOut(2000);
-		} else {
-			$('.dishwasher').fadeOut(2000);
-			$('.lower-third').fadeIn(2000);		
-		}
-	});
+// 	var socket = io.connect('http://rpi-development.local:8080');
+// 	socket.on('dishwasher', function (dishwasherReady) {
+// 		if (dishwasherReady) {
+// 			$('.dishwasher').fadeIn(2000);
+// 			$('.lower-third').fadeOut(2000);
+// 		} else {
+// 			$('.dishwasher').fadeOut(2000);
+// 			$('.lower-third').fadeIn(2000);		
+// 		}
+// 	});
 
 	var weatherParams = {
 		'q':'Beilngries,Germany',
@@ -140,7 +139,7 @@ jQuery(document).ready(function($) {
 
 	(function updateCalendarData()
 	{
-		new ical_parser("calendar.php", function(cal){
+		new ical_parser("calendar.php", function(cal) {
         	events = cal.getEvents();
         	eventList = [];
 
@@ -176,7 +175,7 @@ jQuery(document).ready(function($) {
 	        		eventList.push({'description':e.SUMMARY,'days':days});
         		}
         	};
-        	eventList.sort(function(a,b){return a.days-b.days});
+        	eventList.sort(function(a,b) {return a.days-b.days});
 
         	setTimeout(function() {
         		updateCalendarData();
@@ -296,8 +295,7 @@ jQuery(document).ready(function($) {
 
 	(function updateWeatherForecast()
 	{
-			$.getJSON('http://api.openweathermap.org/data/2.5/forecast', weatherParams, function(json, textStatus) {
-
+		$.getJSON('http://api.openweathermap.org/data/2.5/forecast', weatherParams, function(json, textStatus) {
 			var forecastData = {};
 
 			for (var i in json.list) {
@@ -314,7 +312,6 @@ jQuery(document).ready(function($) {
 					forecastData[dateKey]['temp_min'] = (forecast.main.temp < forecastData[dateKey]['temp_min']) ? forecast.main.temp : forecastData[dateKey]['temp_min'];
 					forecastData[dateKey]['temp_max'] = (forecast.main.temp > forecastData[dateKey]['temp_max']) ? forecast.main.temp : forecastData[dateKey]['temp_max']; 
 				}
-
 			}
 
 			var forecastTable = $('<table />').addClass('forecast-table');
@@ -332,7 +329,6 @@ jQuery(document).ready(function($) {
 				opacity -= 0.155;
 			}
 
-
 			$('.forecast').updateWithText(forecastTable, 1000);
 		});
 
@@ -344,9 +340,9 @@ jQuery(document).ready(function($) {
 	(function fetchNews() {
 		$.feedToJson({
 			feed:'http://www.tagesschau.de/xml/rss2',
-			//feed:'http://www.nu.nl/feeds/rss/achterklap.rss',
+			feed:'http://www.heise.de/security/news/news.rdf',
 			//feed:'http://www.nu.nl/feeds/rss/opmerkelijk.rss',
-			success: function(data){
+			success: function(data) {
 				news = [];
 				for (var i in data.item) {
 					var item = data.item[i];
