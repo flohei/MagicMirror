@@ -99,7 +99,7 @@ jQuery(document).ready(function($) {
 	});
 
 	var weatherParams = {
-		'q':'Beilngries,Germany,
+		'q':'Beilngries,Germany',
 		'units':'metric',
 		'lang':lang
 	};
