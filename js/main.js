@@ -355,32 +355,17 @@ jQuery(document).ready(function($) {
 				fetchNews();
 			}, 60000);
 		}
-	
-// 		$.feedToJson({
-// 			feed:'http://www.tagesschau.de/xml/rss2',
-// // 			feed:'http://www.heise.de/security/news/news.rdf',
-// // 			feed:'http://www.nu.nl/feeds/rss/opmerkelijk.rss',
-// 			success: function(data) {
-// 				news = [];
-// 				for (var i in data.item) {
-// 					var item = data.item[i];
-// 					news.push(item.title);
-// 				}
-// 			}
-// 		});
-// 		setTimeout(function() {
-// 			fetchNews();
-// 		}, 60000);
 	})();
 
 	(function showNews() {
-		var newsItem = news[newsIndex];
+		// getting a random number to pick from from the news array randomly
+		var randomNewsIndex = 1 + Math.floor(Math.random() * (news.length - 1));
+		var newsItem = news[randomNewsIndex];
+		
 		$('.news').updateWithText(newsItem,2000);
 
-		newsIndex--;
-		if (newsIndex < 0) newsIndex = news.length - 1;
 		setTimeout(function() {
 			showNews();
-		}, 5500);
+		}, 8000);
 	})();
 });
