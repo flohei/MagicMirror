@@ -48,7 +48,7 @@ jQuery(document).ready(function($) {
     // multi-langugage support according to browser-lang
     // var lang = window.navigator.language;
     
-    // actually, I'd rather hardcode it for my usage
+    // actually, I'd rather hard-code it for my usage
     var lang = 'de';
     
     switch (lang)
@@ -128,10 +128,10 @@ jQuery(document).ready(function($) {
 		var month = now.getMonth();
 		var year = now.getFullYear();
 
-		var date = days[day] + ', ' + date + ' ' + months[month] + ' ' + year;
+		var date = days[day] + ', ' + date + '. ' + months[month] + ' ' + year;
 
 		$('.date').html(date);
-		$('.time').html(now.toTimeString().substring(0,5) + '<span class="sec">'+now.toTimeString().substring(6,8)+'</span>');
+		$('.time').html(now.toTimeString().substring(0,5) + '<span class="sec">' + now.toTimeString().substring(6,8) + '</span>');
 
 		setTimeout(function() {
 			updateTime();
@@ -155,10 +155,10 @@ jQuery(document).ready(function($) {
 
 						var dt;
 						if (subKey == 'VALUE=DATE') {
-							//date
+							// date
 							dt = new Date(value.substring(0,4), value.substring(4,6) - 1, value.substring(6,8));
 						} else {
-							//time
+							// time
 							dt = new Date(value.substring(0,4), value.substring(4,6) - 1, value.substring(6,8), value.substring(9,11), value.substring(11,13), value.substring(13,15));
 						}
 
@@ -167,12 +167,11 @@ jQuery(document).ready(function($) {
 					}
         		}
 
-
         		var now = new Date();
         		var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
         		var days = moment(e.startDate).diff(moment(today), 'days');
 
-        		//only add fututre events
+        		// only add fututre events
         		if (days >= 0) {
 	        		eventList.push({'description':e.SUMMARY,'days':days});
         		}
@@ -264,7 +263,6 @@ jQuery(document).ready(function($) {
 		}
 		
 		$.getJSON('http://api.openweathermap.org/data/2.5/weather', weatherParams, function(json, textStatus) {
-
 			var temp = roundVal(json.main.temp);
 			var temp_min = roundVal(json.main.temp_min);
 			var temp_max = roundVal(json.main.temp_max);
@@ -345,7 +343,7 @@ jQuery(document).ready(function($) {
 
 	(function fetchNews() {
 		$.feedToJson({
-			feed:'http://feeds.nos.nl/nosjournaal?format=rss',
+			feed:'http://www.tagesschau.de/xml/rss2',
 			//feed:'http://www.nu.nl/feeds/rss/achterklap.rss',
 			//feed:'http://www.nu.nl/feeds/rss/opmerkelijk.rss',
 			success: function(data){
