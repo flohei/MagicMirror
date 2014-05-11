@@ -47,7 +47,11 @@ jQuery(document).ready(function($) {
 	var compliment;
 
     // multi-langugage support according to browser-lang
-    var lang = window.navigator.language;
+    // var lang = window.navigator.language;
+    
+    // actually, I'd rather hardcode it for my usage
+    var lang = de;
+    
     switch (lang)
     {
         case 'de':
@@ -83,7 +87,7 @@ jQuery(document).ready(function($) {
             var in_days = 'days';
     }
 
-	//connect do Xbee monitor
+	// connect do Xbee monitor
 	var socket = io.connect('http://rpi-development.local:8080');
 	socket.on('dishwasher', function (dishwasherReady) {
 		if (dishwasherReady) {
@@ -95,9 +99,8 @@ jQuery(document).ready(function($) {
 		}
 	});
 
-
 	var weatherParams = {
-		'q':'Baarn,Netherlands',
+		'q':'Beilngries,Germany,
 		'units':'metric',
 		'lang':lang
 	};
@@ -126,8 +129,7 @@ jQuery(document).ready(function($) {
 		var month = now.getMonth();
 		var year = now.getFullYear();
 
-		var date = days[day] + ', ' + date+' ' + months[month] + ' ' + year;
-
+		var date = days[day] + ', ' + date + ' ' + months[month] + ' ' + year;
 
 		$('.date').html(date);
 		$('.time').html(now.toTimeString().substring(0,5) + '<span class="sec">'+now.toTimeString().substring(6,8)+'</span>');
@@ -265,7 +267,6 @@ jQuery(document).ready(function($) {
 			'50n':'wi-night-alt-cloudy-windy'		
 		}
 		
-
 		$.getJSON('http://api.openweathermap.org/data/2.5/weather', weatherParams, function(json, textStatus) {
 
 			var temp = roundVal(json.main.temp);

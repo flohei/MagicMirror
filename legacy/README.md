@@ -37,7 +37,7 @@ All the photographs we want to process need to be normalized, which means that t
 
 ## Current Status
 
-* 2014-05-11: 8:06am — Compiling OpenCV done. That makes a total of 10 hours 15 minutes to compile. Also, today I found out that Michael has his web code up on GitHub. So I'm trying to merge these two ideas now.
+* 2014-05-11: 8:06am — Compiling OpenCV done. That makes a total of 10 hours 15 minutes to compile.
 * 2014-05-10: Raspberry Pi Camera was dead on arrival. :-( Got to get another one. Started compiling OpenCV on the Pi at 9:51pm.
 * 2014-05-08: As of today I started implementing the different pieces of this work. The face recognition does work on my computer, `create_csv.sh` works as well. I also started implementing the backend. Yesterday I ordered the camera. I hope to try to compile OpenCV for the RPi over the weekend and get some first results by sunday.
 
@@ -60,9 +60,6 @@ Florian Heiber
 [blog.flohei.de](http://blog.flohei.de)  
 [@flohei](http://twitter.com/flohei)
 
-For the original project, the idea and the great tutorial all your thank-you notes, wishes and presents should go directly to [Michael Teeuw][4].
-
 [1]: http://s.flohei.de/2B
 [2]: http://opencv.org
 [3]: http://docs.opencv.org/trunk/modules/contrib/doc/facerec/facerec_tutorial.html#preparing-the-data
-[4]: https://twitter.com/michmich
