@@ -339,12 +339,12 @@ jQuery(document).ready(function($) {
 
 	(function fetchNews() {
 		var feeds = ['http://www.tagesschau.de/xml/rss2', 'http://www.heise.de/security/news/news.rdf'];
+		news = [];
 		
 		for (var i in feeds) {
 			$.feedToJson({
 				feed:feeds[i],
 				success:function(data) {
-					news = [];
 					for (var j in data.item) {
 						var item = data.item[j];
 						news.push(item.title);
