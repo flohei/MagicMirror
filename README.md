@@ -52,6 +52,13 @@ All the photographs we want to process need to be normalized, which means that t
 * Settings
   * OpenWeatherMap API Key
   * Standort (für OWM)
+  
+## Resources
+
+* [OpenCV + Raspicam](http://www.raspberrypi.org/forums/viewtopic.php?f=33&t=61834)
+* [Raspberry Pi + OpenCV](http://mitchtech.net/raspberry-pi-opencv/)
+* [Face Recognition with OpenCV](http://docs.opencv.org/trunk/modules/contrib/doc/facerec/facerec_tutorial.html#preparing-the-data)
+* [ThinkRPi](http://thinkrpi.wordpress.com)
 
 ## Contact
 
