@@ -8,10 +8,10 @@ jQuery.fn.updateWithText = function(text, speed)
 			$(this).html(text);
 			$(this).fadeIn(speed/2, function() {
 				//done
-			});		
+			});
 		});
 	}
-} 
+}
 
 jQuery.fn.outerHTML = function(s) {
     return s
@@ -37,6 +37,7 @@ function kmh2beaufort(kmh)
 }
 
 jQuery(document).ready(function($) {
+
 	var news = [];
 	var newsIndex = 0;
 
@@ -45,64 +46,21 @@ jQuery(document).ready(function($) {
 	var lastCompliment;
 	var compliment;
 
-    // multi-langugage support according to browser-lang
-    // var lang = window.navigator.language;
-    // actually, I'd rather hard-code it for my usage
-    var lang = 'de';
-    
-    switch (lang)
-    {
-        case 'de':
-            var days = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'];
-            var months = ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
-            var dayAbbr = ['So','Mo','Di','Mi','Do','Fr','Sa'];
-            var today = 'heute';
-            var tomorrow = 'morgen';
-            var in_days = 'Tage';
-            break;
-        case 'nl':
-            var days = ['zondag','maandag','dinsdag','woensdag','donderdag','vrijdag','zaterdag'];
-            var months = ['januari','februari','maart','april','mei','juni','juli','augustus','september','oktober','november','december'];
-            var dayAbbr = ['zo','ma','di','wo','do','vr','za'];
-            var today = 'vandaag';
-            var tomorrow = 'morgen';
-            var in_days = 'dagen';
-            break;
-       case 'fr':
-            var days = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
-            var months = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
-            var dayAbbr = ['dim','lun','mar','mer','jeu','ven','sam'];
-            var today = 'aujourd\'hui';
-            var tomorrow = 'demain';
-            var in_days = 'jour(s)';
-            break;            
-        default:
-            var days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-            var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-            var dayAbbr = ['Sun','Mon','Tues','Wed','Thur','Fri','Sat'];
-            var today = 'Today';
-            var tomorrow = 'Tomorrow';
-            var in_days = 'days';
-    }
+    moment.lang(lang);
 
-	// connect do Xbee monitor
-// 	var socket = io.connect('http://rpi-development.local:8080');
-// 	socket.on('dishwasher', function (dishwasherReady) {
-// 		if (dishwasherReady) {
-// 			$('.dishwasher').fadeIn(2000);
-// 			$('.lower-third').fadeOut(2000);
-// 		} else {
-// 			$('.dishwasher').fadeOut(2000);
-// 			$('.lower-third').fadeIn(2000);		
-// 		}
-// 	});
+	//connect do Xbee monitor
+	var socket = io.connect('http://rpi-alarm.local:8082');
+	socket.on('dishwasher', function (dishwasherReady) {
+		if (dishwasherReady) {
+			$('.dishwasher').fadeIn(2000);
+			$('.lower-third').fadeOut(2000);
+		} else {
+			$('.dishwasher').fadeOut(2000);
+			$('.lower-third').fadeIn(2000);
+		}
+	});
 
-	var weatherParams = {
-		'q':'Beilngries,Germany',
-		'units':'metric',
-		'lang':lang
-	};
-	
+
 	(function checkVersion()
 	{
 		$.getJSON('githash.php', {}, function(json, textStatus) {
@@ -120,17 +78,12 @@ jQuery(document).ready(function($) {
 
 	(function updateTime()
 	{
-		var now = new Date();
-
-		var day = now.getDay();
-		var date = now.getDate();
-		var month = now.getMonth();
-		var year = now.getFullYear();
-
-		var date = days[day] + ', ' + date + '. ' + months[month] + ' ' + year;
+        var now = moment();
+        var date = now.format('LLLL').split(' ',4);
+        date = date[0] + ' ' + date[1] + ' ' + date[2] + ' ' + date[3];
 
 		$('.date').html(date);
-		$('.time').html(now.toTimeString().substring(0,5) + '<span class="sec">' + now.toTimeString().substring(6,8) + '</span>');
+		$('.time').html(now.format('HH') + ':' + now.format('mm') + '<span class="sec">'+now.format('ss')+'</span>');
 
 		setTimeout(function() {
 			updateTime();
@@ -139,7 +92,7 @@ jQuery(document).ready(function($) {
 
 	(function updateCalendarData()
 	{
-		new ical_parser("calendar.php", function(cal) {
+		new ical_parser("calendar.php", function(cal){
         	events = cal.getEvents();
         	eventList = [];
 
@@ -154,28 +107,68 @@ jQuery(document).ready(function($) {
 
 						var dt;
 						if (subKey == 'VALUE=DATE') {
-							// date
+							//date
 							dt = new Date(value.substring(0,4), value.substring(4,6) - 1, value.substring(6,8));
 						} else {
-							// time
+							//time
 							dt = new Date(value.substring(0,4), value.substring(4,6) - 1, value.substring(6,8), value.substring(9,11), value.substring(11,13), value.substring(13,15));
 						}
 
-						if (mainKey == 'DTSTART') e.startDate = dt; 
-						if (mainKey == 'DTEND') e.endDate = dt; 
+						if (mainKey == 'DTSTART') e.startDate = dt;
+						if (mainKey == 'DTEND') e.endDate = dt;
 					}
         		}
 
-        		var now = new Date();
-        		var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-        		var days = moment(e.startDate).diff(moment(today), 'days');
+                if (e.startDate == undefined){
+                    //some old events in Gmail Calendar is "start_date"
+                    //FIXME: problems with Gmail's TimeZone
+            		var days = moment(e.DTSTART).diff(moment(), 'days');
+            		var seconds = moment(e.DTSTART).diff(moment(), 'seconds');
+                    var startDate = moment(e.DTSTART);
+                } else {
+            		var days = moment(e.startDate).diff(moment(), 'days');
+            		var seconds = moment(e.startDate).diff(moment(), 'seconds');
+                    var startDate = moment(e.startDate);
+                }
 
-        		// only add fututre events
-        		if (days >= 0) {
-	        		eventList.push({'description':e.SUMMARY,'days':days});
+        		//only add fututre events, days doesn't work, we need to check seconds
+        		if (seconds >= 0) {
+                    if (seconds <= 60*60*5 || seconds >= 60*60*24*2) {
+                        var time_string = moment(startDate).fromNow();
+                    }else {
+                        var time_string = moment(startDate).calendar()
+                    }
+                    if (!e.RRULE) {
+    	        		eventList.push({'description':e.SUMMARY,'seconds':seconds,'days':time_string});
+                    }
+                    e.seconds = seconds;
         		}
-        	};
-        	eventList.sort(function(a,b) {return a.days-b.days});
+                
+                // Special handling for rrule events
+                if (e.RRULE) {
+                    var options = new RRule.parseString(e.RRULE);
+                    options.dtstart = e.startDate;
+                    var rule = new RRule(options);
+                    
+                    // TODO: don't use fixed end date here, use something like now() + 1 year
+                    var dates = rule.between(new Date(), new Date(2016,11,31), true, function (date, i){return i < 10});
+                    for (date in dates) {
+                        var dt = new Date(dates[date]);
+                        var days = moment(dt).diff(moment(), 'days');
+                        var seconds = moment(dt).diff(moment(), 'seconds');
+                        var startDate = moment(dt);
+                     	if (seconds >= 0) {
+                            if (seconds <= 60*60*5 || seconds >= 60*60*24*2) {
+                                var time_string = moment(dt).fromNow();
+                            } else {
+                                var time_string = moment(dt).calendar()
+                            }
+                            eventList.push({'description':e.SUMMARY,'seconds':seconds,'days':time_string});
+                        }           
+                    }
+                }
+            };
+        	eventList.sort(function(a,b){return a.seconds-b.seconds});
 
         	setTimeout(function() {
         		updateCalendarData();
@@ -188,18 +181,13 @@ jQuery(document).ready(function($) {
 		table = $('<table/>').addClass('xsmall').addClass('calendar-table');
 		opacity = 1;
 
+
 		for (var i in eventList) {
 			var e = eventList[i];
-			var days = e.days;
 
-			var daysString = (days == 1) ? tomorrow :  days + ' ' + in_days;
-    		if (days == 0) {
-    			daysString = today;
-    		}
-			
 			var row = $('<tr/>').css('opacity',opacity);
 			row.append($('<td/>').html(e.description).addClass('description'));
-			row.append($('<td/>').html(daysString).addClass('days dimmed'));
+			row.append($('<td/>').html(e.days).addClass('days dimmed'));
 			table.append(row);
 
 			opacity -= 1 / eventList.length;
@@ -212,31 +200,32 @@ jQuery(document).ready(function($) {
         }, 1000);
 	})();
 
-// 	(function updateCompliment()
-// 	{
-// 		var compliments = [
-// 			'Hey, handsome!',
-// 			'Hi, sexy!',
-// 			'Hello, beauty!',
-// 			'You look sexy!',
-// 			'Wow, you look hot!',
-// 			'Looking good today!',
-// 			'You look nice!',
-// 			'Enjoy your day!'
-// 		];
-// 
-// 		while (compliment == lastCompliment) {
-// 			compliment = Math.floor(Math.random()*compliments.length);
-// 		}
-// 
-// 		$('.compliment').updateWithText(compliments[compliment], 4000);
-// 
-// 		lastCompliment = compliment;
-// 
-// 		setTimeout(function() {
-// 			updateCompliment(true);
-// 		}, 30000);
-// 	})();
+	(function updateCompliment()
+	{
+        //see compliments.js
+		while (compliment == lastCompliment) {
+     
+      //Check for current time  
+      var compliments;
+      var date = new Date();
+      var hour = date.getHours();
+      //set compliments to use
+      if (hour >= 3 && hour < 12) compliments = morning;
+      if (hour >= 12 && hour < 17) compliments = afternoon;
+      if (hour >= 17 || hour < 3) compliments = evening;
+
+		compliment = Math.floor(Math.random()*compliments.length);
+		}
+
+		$('.compliment').updateWithText(compliments[compliment], 4000);
+
+		lastCompliment = compliment;
+
+		setTimeout(function() {
+			updateCompliment(true);
+		}, 30000);
+
+	})();
 
 	(function updateCurrentWeather()
 	{
@@ -258,10 +247,12 @@ jQuery(document).ready(function($) {
 			'10n':'wi-night-rain',
 			'11n':'wi-night-thunderstorm',
 			'13n':'wi-night-snow',
-			'50n':'wi-night-alt-cloudy-windy'		
+			'50n':'wi-night-alt-cloudy-windy'
 		}
-		
+
+
 		$.getJSON('http://api.openweathermap.org/data/2.5/weather', weatherParams, function(json, textStatus) {
+
 			var temp = roundVal(json.main.temp);
 			var temp_min = roundVal(json.main.temp_min);
 			var temp_max = roundVal(json.main.temp_max);
@@ -295,7 +286,28 @@ jQuery(document).ready(function($) {
 
 	(function updateWeatherForecast()
 	{
-		$.getJSON('http://api.openweathermap.org/data/2.5/forecast', weatherParams, function(json, textStatus) {
+		var iconTable = {
+			'01d':'wi-day-sunny',
+			'02d':'wi-day-cloudy',
+			'03d':'wi-cloudy',
+			'04d':'wi-cloudy-windy',
+			'09d':'wi-showers',
+			'10d':'wi-rain',
+			'11d':'wi-thunderstorm',
+			'13d':'wi-snow',
+			'50d':'wi-fog',
+			'01n':'wi-night-clear',
+			'02n':'wi-night-cloudy',
+			'03n':'wi-night-cloudy',
+			'04n':'wi-night-cloudy',
+			'09n':'wi-night-showers',
+			'10n':'wi-night-rain',
+			'11n':'wi-night-thunderstorm',
+			'13n':'wi-night-snow',
+			'50n':'wi-night-alt-cloudy-windy'
+		}
+			$.getJSON('http://api.openweathermap.org/data/2.5/forecast', weatherParams, function(json, textStatus) {
+
 			var forecastData = {};
 
 			for (var i in json.list) {
@@ -305,29 +317,36 @@ jQuery(document).ready(function($) {
 				if (forecastData[dateKey] == undefined) {
 					forecastData[dateKey] = {
 						'timestamp':forecast.dt * 1000,
+						'icon':forecast.weather[0].icon,
 						'temp_min':forecast.main.temp,
 						'temp_max':forecast.main.temp
 					};
 				} else {
+					forecastData[dateKey]['icon'] = forecast.weather[0].icon;
 					forecastData[dateKey]['temp_min'] = (forecast.main.temp < forecastData[dateKey]['temp_min']) ? forecast.main.temp : forecastData[dateKey]['temp_min'];
-					forecastData[dateKey]['temp_max'] = (forecast.main.temp > forecastData[dateKey]['temp_max']) ? forecast.main.temp : forecastData[dateKey]['temp_max']; 
+					forecastData[dateKey]['temp_max'] = (forecast.main.temp > forecastData[dateKey]['temp_max']) ? forecast.main.temp : forecastData[dateKey]['temp_max'];
 				}
+
 			}
+
 
 			var forecastTable = $('<table />').addClass('forecast-table');
 			var opacity = 1;
 			for (var i in forecastData) {
 				var forecast = forecastData[i];
+			    var iconClass = iconTable[forecast.icon];
 				var dt = new Date(forecast.timestamp);
 				var row = $('<tr />').css('opacity', opacity);
 
-				row.append($('<td/>').addClass('day').html(dayAbbr[dt.getDay()]));
+				row.append($('<td/>').addClass('day').html(moment.weekdaysShort(dt.getDay())));
+				row.append($('<td/>').addClass('icon-small').addClass(iconClass));
 				row.append($('<td/>').addClass('temp-max').html(roundVal(forecast.temp_max)));
 				row.append($('<td/>').addClass('temp-min').html(roundVal(forecast.temp_min)));
 
 				forecastTable.append(row);
 				opacity -= 0.155;
 			}
+
 
 			$('.forecast').updateWithText(forecastTable, 1000);
 		});
@@ -338,34 +357,30 @@ jQuery(document).ready(function($) {
 	})();
 
 	(function fetchNews() {
-		var feeds = ['http://www.tagesschau.de/xml/rss2', 'http://www.heise.de/security/news/news.rdf'];
-		news = [];
-		
-		for (var i in feeds) {
-			$.feedToJson({
-				feed:feeds[i],
-				success:function(data) {
-					for (var j in data.item) {
-						var item = data.item[j];
-						news.push(item.title);
-					}
+		$.feedToJson({
+			feed: feed,
+			success: function(data){
+				news = [];
+				for (var i in data.item) {
+					var item = data.item[i];
+					news.push(item.title);
 				}
-			});
-			setTimeout(function() {
-				fetchNews();
-			}, 60000);
-		}
+			}
+		});
+		setTimeout(function() {
+			fetchNews();
+		}, 60000);
 	})();
 
 	(function showNews() {
-		// getting a random number to pick from from the news array randomly
-		var randomNewsIndex = 1 + Math.floor(Math.random() * (news.length - 1));
-		var newsItem = news[randomNewsIndex];
-		
+		var newsItem = news[newsIndex];
 		$('.news').updateWithText(newsItem,2000);
 
+		newsIndex--;
+		if (newsIndex < 0) newsIndex = news.length - 1;
 		setTimeout(function() {
 			showNews();
-		}, 8000);
+		}, 5500);
 	})();
+
 });
